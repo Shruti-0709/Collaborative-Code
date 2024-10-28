@@ -4,10 +4,9 @@ import Editor from './Editor'
 
 function EditorPage() {
     const [clients,setClient]=useState([
-        {
-
-        }
-    ])
+        {socketId : 1, username : "Shruti"},
+        {socketId : 2, username : "Shreya"}
+    ]);
     return (
         <div className='container-fluid vh-100'>
             <div className='row h-100'>
