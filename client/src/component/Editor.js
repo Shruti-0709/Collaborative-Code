@@ -11,7 +11,10 @@ function Editor() {
     useEffect(()=>{
         const init = async () => {
             const editor = CodeMirror.fromTextArea(
+
                 (editorRef.current = document.getElementById("realTimeEditor")),
+
+                document.getElementById("realTimeEditor"),
                 {
                     mode: {name:"javascript",json: true},
                     theme:"dracula",

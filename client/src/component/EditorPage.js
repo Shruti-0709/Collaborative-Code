@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Client from './Client';
 import Editor from './Editor';
 import { initSocket } from '../socket';
 import { useNavigate, useLocation, useParams, Navigate } from 'react-router-dom';
-import { useRef } from 'react';
 import { toast } from 'react-hot-toast';
 
 function EditorPage() {
-    const [clients, setClient] = useState([]);
+    const [clients, setClient] = useState([]); 
     const socketRef = useRef(null);
     const location = useLocation();
     const { roomId } = useParams();
@@ -36,6 +35,8 @@ function EditorPage() {
                 }
                 setClient(clients);
             });
+
+
 
             socketRef.current.on('Disconnected', ({ socketId, username }) => {
                 toast.success(`${username} left the room`);
@@ -74,7 +75,9 @@ function EditorPage() {
                     <div className='mt-auto'>
                         <hr />
                         <button className='btn btn-success'>Copy Room Id</button>
-                        <button className='mt-2 btn btn-danger mb-2 px-3 btn-block'>Leave Room</button>
+                        <button className='mt-2 btn btn-danger mb-2 px-3 btn-block' >
+                           
+                            Leave Room</button>
                     </div>
                 </div>
                 <div className='col-md-10 text-light d-flex flex-column h-100'>
@@ -86,3 +89,4 @@ function EditorPage() {
 }
 
 export default EditorPage;
+

@@ -36,9 +36,10 @@ io.on("connection", (socket) => {
         });
     });
     socket.on("disconnect", () => {
+
         const rooms = [...socket.rooms];
         rooms.forEach((roomId) => {
-            socket.to(roomId).emit("disconnected", {
+            socket.to(roomId).emit("Disconnected", {
                 socketId: socket.id,
                 username: userSocketMap[socket.id],
             });
