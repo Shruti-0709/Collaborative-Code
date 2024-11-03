@@ -1,6 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react';
+import {v4 as uuid} from 'uuid';
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
+    const [roomId, setRoomId] = useState("");
+    const [username, setUsername] = useState("");
+    const navigate = useNavigate();
+
+    const generateRoomId = (e) => {
+        e.preventDefault();
+        const id  = uuid();
+        setRoomId(id);
+        toast.success("Room Id Generated");
+    }
+
+    const joinRoom = () => {
+        if(!roomId || !username){
+            toast.error("Both the field is required");
+            return;
+        }
+
+        navigate(`/editor/${roomId}`,{
+            state : {username},
+        }); 
+        toast.success('Room is Created');  
+    };
+
+
     return (
         <div className='container-fluid'>
             <div className='row justify-content-center align-items-center min-vh-100'>
@@ -14,19 +41,26 @@ function Home() {
                         />
                         <h4 className='text-light'> Enter the Room Id</h4>
                         <div className='form-group'>
-                            <input type='text'
+                            <input 
+                            value={roomId}
+                            onChange={(e)=>setRoomId(e.target.value)} 
+                            type='text'
                              className='form-control mb-2'
                               placeholder='Room Id'/>
                         </div>      
                         <div className='form-group'>
-                        <input type='text'
+                        <input
+                        value ={username}
+                        onChange={(e)=>setUsername(e.target.value)}
+                         type='text'
                          className='form-control mb-2'
                          placeholder='Username'/>
                         </div>
-                        <button className='btn btn-success btn-lg btn-block'>JOIN</button>
+                        <button onClick={joinRoom} className='btn btn-success btn-lg btn-block'>JOIN</button>
                         <p className='mt-3 text-light'>
                         Don't have a room Id?
-                        <span className='text-success p-2 ' style={{cursor:"pointer"}}>New Room</span>
+                        <span className='text-success p-2 ' style={{cursor:"pointer"}}
+                        onClick={generateRoomId}>New Room</span>
                         </p>
                     </div>
                 </div>
