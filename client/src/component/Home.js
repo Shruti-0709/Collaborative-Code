@@ -26,7 +26,7 @@ function Home() {
         }); 
         toast.success('Room is Created');  
     };
-
+ 
 
     return (
         <div className='container-fluid'>
@@ -45,16 +45,16 @@ function Home() {
                             value={roomId}
                             onChange={(e)=>setRoomId(e.target.value)} 
                             type='text'
-                             className='form-control mb-2'
-                              placeholder='Room Id'/>
+                            className='form-control mb-2'
+                            placeholder='Room Id'/>
                         </div>      
                         <div className='form-group'>
                         <input
                         value ={username}
                         onChange={(e)=>setUsername(e.target.value)}
-                         type='text'
-                         className='form-control mb-2'
-                         placeholder='Username'/>
+                        type='text'
+                        className='form-control mb-2'
+                        placeholder='Username'/>
                         </div>
                         <button onClick={joinRoom} className='btn btn-success btn-lg btn-block'>JOIN</button>
                         <p className='mt-3 text-light'>

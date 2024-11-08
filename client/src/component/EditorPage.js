@@ -11,6 +11,8 @@ function EditorPage() {
     const location = useLocation();
     const { roomId } = useParams();
     const navigate = useNavigate();
+    const codeRef=useRef(null) ;
+    
 
     useEffect(() => {
         const init = async () => {
@@ -21,6 +23,7 @@ function EditorPage() {
             };
 
             socketRef.current = await initSocket();
+            
             socketRef.current.on('connect_error', handleError);
             socketRef.current.on('connect_failed', handleError);
 
@@ -28,27 +31,41 @@ function EditorPage() {
                 roomId,
                 username: location.state?.username,
             });
-
             socketRef.current.on('joined', ({ clients, username, socketId }) => {
                 if (username !== location.state?.username) {
                     toast.success(`${username} joined the room`);
                 }
-                setClient(clients);
+            
+                // Accessing the correct username field from the object
+                setClient(clients.map(client => ({
+                    socketId: client.socketId,
+                    username: client.username.username // Access the username from the object
+                })));
+
+            socketRef.current.emit('sync-code',{
+                code:codeRef.current,
+                socketId
+                });
             });
-
-
-
-            socketRef.current.on('Disconnected', ({ socketId, username }) => {
-                toast.success(`${username} left the room`);
-                setClient((prev) => prev.filter((client) => client.socketId !== socketId));
+            
+            socketRef.current.on("userLeft", ({ socketId, username }) => {
+                if (username) {
+                    console.log(`Received disconnect event: ${username} left the room`);
+                    toast.success(`${username} left the room`);
+                    setClient((prev) => prev.filter((client) => client.socketId !== socketId));
+                } else {
+                    console.log(`Disconnected event received without username`);
+                }
             });
+          
+console.log("Disconnected event listener attached");
         };
         init();
 
         return () => {
-            socketRef.current.disconnect();
             socketRef.current.off('joined');
             socketRef.current.off('Disconnected');
+            socketRef.current.disconnect();
         };
 
     }, []);
@@ -57,6 +74,18 @@ function EditorPage() {
         return <Navigate to="/" />;
     }
 
+    const copyRoomId=async ()=>{
+        try{
+            await navigator.clipboard.writeText(roomId);
+            toast.success("Room Id copied");
+        }
+        catch(e){
+            toast.error("Unable to copy Id");
+        }
+    };
+    const leaveRoom=()=>{
+        navigate("/");
+    }
     return (
         <div className='container-fluid vh-100'>
             <div className='row h-100'>
@@ -68,24 +97,27 @@ function EditorPage() {
                     />
                     <hr style={{ marginTop: "1rem" }} />
                     <div className='d-flex flex-column overflow-auto'>
-                        {clients.map((client) => (
-                            <Client key={client.socketId} username={client.username} />
-                        ))}
+                    {clients.map((client) => (
+    <Client key={client.socketId} username={client.username} />
+))}
                     </div>
                     <div className='mt-auto'>
                         <hr />
-                        <button className='btn btn-success'>Copy Room Id</button>
-                        <button className='mt-2 btn btn-danger mb-2 px-3 btn-block' >
-                           
-                            Leave Room</button>
+                        <button onClick={copyRoomId} className='btn btn-success'>Copy Room Id</button>
+                        <button onClick={leaveRoom} className='mt-2 btn btn-danger mb-2 px-3 btn-block' >Leave Room</button>
                     </div>
                 </div>
                 <div className='col-md-10 text-light d-flex flex-column h-100'>
-                    <Editor />
+                    <Editor socketRef={socketRef} 
+                    roomId={roomId}
+                    onCodeChange={(code)=>{
+                        codeRef.current = code;
+                    }}
+                    />
                 </div>
             </div>
         </div>
-    );
+    );   
 }
 
 export default EditorPage;
